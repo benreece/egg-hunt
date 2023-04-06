@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Easter Egg Hunt</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+            background-color: #77dd77;
+			justify-content: center;
+		}
+
+		#egg-container {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			margin-top: 50px;
+		}
+
+		#egg-container img {
+			width: 50px;
+			margin: 20px 50px 20px 50px;
+			cursor: pointer;
+		}
+
+        #help {
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+        }
+
+        .blurry {
+            -webkit-filter: blur(5px) grayscale(50%);
+        }
+
+		#modal {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			background-color: #aec6cf;
+			padding: 20px;
+			border-radius: 5px;
+			box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
+            text-align: center;
+            min-width: 200px;
+            max-width: 300px;
+		}
+
+        #close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        #response.success {
+            border: 1px solid #00ff00;
+            background-color: #ddffdd;
+            color: #002200;
+            padding: 10px;
+        }
+
+        #response.error {
+            border: 1px solid #ff0000;
+            background-color: #ffdddd;
+            color: #220000;
+            padding: 10px;
+        }
+
+		.hidden {
+			display: none;
+		}
+
+        .found {
+            opacity: 0.25;
+        }
+
+        #clue-label {
+            font-weight: bold;
+        }
+
+	</style>
+</head>
+<body>
+    <div id="page-wrap">
+        <div id="egg-container"></div>
+        <div id="help">
+            Need help? &nbsp;<a href="sms:+1559923323">Text 559.927.3323</a>
+        </div>
+    </div>
+
+    <div id="overlay">
+        <div id="modal" class="hidden">
+            <button id="close-btn">&times;</button>
+            <img id="modal-img" src="" width="50px" alt="Egg Image">
+            <p>
+                <span id="clue-label">Clue:</span>
+                <span id="clue"></span>
+            </p>
+            <p id="response"></p>
+            <button id="found-it-btn">I think I found it</button>
+        </div>
+    </div>
+
+
+    <script src="eggData.js"></script>
+	<script>
+		const pageWrap = document.getElementById('page-wrap');
+		const eggContainer = document.getElementById('egg-container');
+		let foundEggs = [];
+        let currentIndex = null;
+
+		for (let i = 0; i < eggData.length; i++) {
+			const egg = eggData[i];
+			const img = document.createElement('img');
+			img.setAttribute('id', `egg-${i}`);
+			img.setAttribute('src', egg.image);
+			if (egg.found) {
+				img.classList.add('found');
+			}
+			img.addEventListener('click', () => {
+				if (!eggData[i].found) {
+					showClue(i);
+				} else {
+					congratulate(i);
+				}
+			});
+			eggContainer.appendChild(img);
+		}
+
+		const modal = document.getElementById('modal');
+		const modalImg = document.getElementById('modal-img');
+		const modalClue = document.getElementById('clue');
+		const modalResponse = document.getElementById('response');
+		const foundItBtn = document.getElementById('found-it-btn');
+		const closeBtn = document.getElementById('close-btn');
+
+        closeBtn.addEventListener('click', hideModal);
+        foundItBtn.addEventListener('click', checkLocation);
+
+        storedEggs = JSON.parse(window.localStorage.getItem("foundEggs"));
+        if (Array.isArray(storedEggs)) {
+            storedEggs.forEach(index => addFoundEgg(index));
+        }
+
+		function showModal(index) {
+            if (currentIndex) {
+                hideModal();
+            }
+            pageWrap.classList.add('blurry');
+            currentIndex = index;
+			const egg = eggData[index];
+			modalImg.setAttribute('src', egg.image);
+			modal.classList.remove('hidden');
+		}
+
+        function showClue(index) {
+			const egg = eggData[index];
+			modalClue.textContent = egg.clue;
+            hideResponse()
+			foundItBtn.classList.remove('hidden');
+            showModal(index);
+        }
+
+		function hideModal() {
+			modal.classList.add('hidden');
+            modalResponse.classList.add('hidden');
+            foundItBtn.classList.remove('hidden');
+            pageWrap.classList.remove('blurry');
+            currentIndex = null;
+		}
+
+		function congratulate(index) {
+			const egg = eggData[index];
+            showSuccess(`You found the egg! Inside you find this secret letter: ${egg.letter}`);
+            modalResponse.classList.remove('hidden');
+            showModal(index);
+		}
+
+        function showResponse(message) {
+			foundItBtn.classList.add('hidden');
+            modalResponse.textContent = message;
+        }
+
+        function showError(message) {
+            modalResponse.classList.remove('hidden');
+            modalResponse.classList.add('error');
+            modalResponse.classList.remove('success');
+            showResponse(message);
+            setTimeout(hideResponse, 5000, currentIndex);
+        }
+
+        function showSuccess(message) {
+            modalResponse.classList.remove('hidden');
+            modalResponse.classList.add('success');
+            modalResponse.classList.remove('error');
+            showResponse(message);
+        }
+
+        function hideResponse(index) {
+            if (index == currentIndex) {
+                modalResponse.classList.add('hidden');
+                foundItBtn.classList.remove('hidden');
+            }
+        }
+
+		function checkLocation() {
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(position => {
+					const egg = eggData[currentIndex];
+					const distance = getDistanceInMeters(position.coords.latitude, position.coords.longitude, egg.location.lat, egg.location.lng);
+					if (distance <= 10) {
+                        addFoundEgg(currentIndex);
+                        storeFoundEggs();
+                        congratulate(currentIndex);
+                    } else {
+                        showError(`Sorry, you're still about ${parseFloat(distance.toPrecision(2))} meters away. Keep looking!`);
+                    }
+                }, null, {'enableHighAccuracy': true});
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function addFoundEgg(index) {
+            foundEggs.push(index);
+            eggData[index].found = true;
+            const eggImg = document.getElementById(`egg-${index}`);
+            eggImg.classList.add('found');
+        }
+
+        function storeFoundEggs() {
+            window.localStorage.setItem("foundEggs", JSON.stringify(foundEggs));
+        }
+
+        function clearFoundEggs() {
+            window.localStorage.removeItem("foundEggs", foundEggs);
+        }
+
+        function getDistanceInMeters(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // metres
+            const φ1 = lat1 * Math.PI/180; // φ, λ in radians
+            const φ2 = lat2 * Math.PI/180;
+            const Δφ = (lat2-lat1) * Math.PI/180;
+            const Δλ = (lon2-lon1) * Math.PI/180;
+
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+            const d = R * c; // in metres
+            return d;
+        }
+    </script>
+</body>
+</html>
