@@ -145,7 +145,7 @@
         }
 
 		function showModal(index) {
-            if (currentIndex) {
+            if (currentIndex && currentIndex != index) {
                 hideModal();
             }
             pageWrap.classList.add('blurry');
@@ -174,17 +174,16 @@
 		function congratulate(index) {
 			const egg = eggData[index];
             showSuccess(`You found the egg! Inside you find this secret letter: ${egg.letter}`);
-            modalResponse.classList.remove('hidden');
             showModal(index);
 		}
 
         function showResponse(message) {
 			foundItBtn.classList.add('hidden');
+            modalResponse.classList.remove('hidden');
             modalResponse.textContent = message;
         }
 
         function showError(message) {
-            modalResponse.classList.remove('hidden');
             modalResponse.classList.add('error');
             modalResponse.classList.remove('success');
             showResponse(message);
@@ -192,7 +191,6 @@
         }
 
         function showSuccess(message) {
-            modalResponse.classList.remove('hidden');
             modalResponse.classList.add('success');
             modalResponse.classList.remove('error');
             showResponse(message);
