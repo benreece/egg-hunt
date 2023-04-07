@@ -9,6 +9,7 @@
 			padding: 0;
             background-color: #77dd77;
 			justify-content: center;
+            font-family: Helvetica;
 		}
 
 		#egg-container {
@@ -19,6 +20,7 @@
 		}
 
 		#egg-container img {
+			height: 75px;
 			width: 50px;
 			margin: 20px 50px 20px 50px;
 			cursor: pointer;
@@ -45,7 +47,8 @@
 			box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
             text-align: center;
             min-width: 200px;
-            max-width: 300px;
+            max-width: 400px;
+            width: 80%;
 		}
 
         #close-btn {
@@ -80,6 +83,20 @@
             font-weight: bold;
         }
 
+        .egg-overlay {
+          position: relative;
+          text-align: center;
+        }
+
+        .egg-label {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          font-size: 30px;
+          font-weight: bold;
+          color: white;
+        }
 	</style>
 </head>
 <body>
@@ -90,17 +107,13 @@
         </div>
     </div>
 
-    <div id="overlay">
-        <div id="modal" class="hidden">
-            <button id="close-btn">&times;</button>
-            <img id="modal-img" src="" width="50px" alt="Egg Image">
-            <p>
-                <span id="clue-label">Clue:</span>
-                <span id="clue"></span>
-            </p>
-            <p id="response"></p>
-            <button id="found-it-btn">I think I found it</button>
-        </div>
+    <div id="modal" class="hidden">
+        <button id="close-btn">&times;</button>
+        <img id="modal-img" src="" height="75" width="50" alt="Egg Image">
+        <p id="clue"></p>
+        <p id="response"></p>
+        <button id="found-it-btn">I think I found it</button>
+        <audio id="audio"></audio>
     </div>
 
 
@@ -117,17 +130,22 @@
 			const img = document.createElement('img');
 			img.setAttribute('id', `egg-${i}`);
 			img.setAttribute('src', egg.image);
-			if (egg.found) {
-				img.classList.add('found');
-			}
 			img.addEventListener('click', () => {
-				if (!eggData[i].found) {
-					showClue(i);
-				} else {
-					congratulate(i);
-				}
+                showModal(i);
 			});
-			eggContainer.appendChild(img);
+
+            const eggLabel = document.createElement('div');
+			eggLabel.setAttribute('id', `egg-label-${i}`);
+            eggLabel.classList.add('egg-label');
+            eggLabel.classList.add('hidden');
+            eggLabel.textContent = egg.letter;
+
+            const eggOverlay = document.createElement('div');
+            eggOverlay.classList.add('egg-overlay');
+            eggOverlay.appendChild(img);
+            eggOverlay.appendChild(eggLabel);
+
+			eggContainer.appendChild(eggOverlay);
 		}
 
 		const modal = document.getElementById('modal');
@@ -146,55 +164,58 @@
         }
 
 		function showModal(index) {
-            if (currentIndex && currentIndex != index) {
-                hideModal();
-            }
+            stopAudio();
+
+            const egg = eggData[index];
             pageWrap.classList.add('blurry');
             currentIndex = index;
-			const egg = eggData[index];
+
 			modalImg.setAttribute('src', egg.image);
+
+            if (egg.found) {
+                showSuccess(index);
+                modalClue.classList.add('hidden');
+                modalResponse.classList.remove('hidden');
+                foundItBtn.classList.add('hidden');
+            } else {
+                modalClue.innerHTML = '<b>Clue:</b> ' + eggData[index].clue;
+                modalClue.classList.remove('hidden');
+                modalResponse.classList.add('hidden');
+                foundItBtn.classList.remove('hidden');
+            }
+
 			modal.classList.remove('hidden');
 		}
 
-        function showClue(index) {
-			const egg = eggData[index];
-			modalClue.textContent = egg.clue;
-            hideResponse()
-			foundItBtn.classList.remove('hidden');
-            showModal(index);
-        }
-
 		function hideModal() {
 			modal.classList.add('hidden');
-            modalResponse.classList.add('hidden');
-            foundItBtn.classList.remove('hidden');
             pageWrap.classList.remove('blurry');
             currentIndex = null;
+            stopAudio();
 		}
 
-		function congratulate(index) {
-			const egg = eggData[index];
-            showSuccess(`You found the egg! Inside you find this secret letter: ${egg.letter}`);
-            showModal(index);
-		}
+        function hideClue() {
+			modalClue.classList.add('hidden');
+        }
 
         function showResponse(message) {
 			foundItBtn.classList.add('hidden');
             modalResponse.classList.remove('hidden');
-            modalResponse.textContent = message;
+            modalResponse.innerHTML = message;
         }
 
-        function showError(message) {
+        function showError(distance) {
             modalResponse.classList.add('error');
             modalResponse.classList.remove('success');
-            showResponse(message);
+            showResponse(`Sorry, you're still about ${parseFloat(distance.toPrecision(2))} meters away. Keep looking!`);
             setTimeout(hideResponse, 5000, currentIndex);
         }
 
-        function showSuccess(message) {
+        function showSuccess() {
             modalResponse.classList.add('success');
             modalResponse.classList.remove('error');
-            showResponse(message);
+            foundItBtn.classList.add('hidden');
+            showResponse(`You found the egg!<p>Inside you find this secret character:</p><p style="font-size: 2em; font-weight: bold;">${eggData[currentIndex].letter}</p><hr><p>${eggData[currentIndex].response}</p>`);
         }
 
         function hideResponse(index) {
@@ -212,9 +233,10 @@
 					if (distance <= 10) {
                         addFoundEgg(currentIndex);
                         storeFoundEggs();
-                        congratulate(currentIndex);
+                        hideClue();
+                        showSuccess();
                     } else {
-                        showError(`Sorry, you're still about ${parseFloat(distance.toPrecision(2))} meters away. Keep looking!`);
+                        showError(distance);
                     }
                 }, null, {'enableHighAccuracy': true});
             } else {
@@ -225,6 +247,7 @@
         function addFoundEgg(index) {
             foundEggs.push(index);
             eggData[index].found = true;
+            document.getElementById(`egg-label-${index}`).classList.remove('hidden');
             const eggImg = document.getElementById(`egg-${index}`);
             eggImg.classList.add('found');
         }
@@ -235,6 +258,7 @@
 
         function clearFoundEggs() {
             window.localStorage.removeItem("foundEggs", foundEggs);
+            window.location.reload();
         }
 
         function getDistanceInMeters(lat1, lon1, lat2, lon2) {
@@ -251,6 +275,17 @@
 
             const d = R * c; // in metres
             return d;
+        }
+
+        function playAudio(source) {
+            audio = document.getElementById('audio');
+            audio.src = source;
+            audio.play();
+        }
+
+        function stopAudio() {
+            audio = document.getElementById('audio');
+            audio.pause();
         }
     </script>
 </body>
