@@ -1,32 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8">
-	<title>Easter Egg Hunt</title>
-	<style>
-		body {
-			margin: 0;
-			padding: 0;
+    <meta charset="UTF-8">
+    <title>Easter Egg Hunt</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
             background-color: #77dd77;
-			justify-content: center;
+            justify-content: center;
             font-family: Helvetica;
-		}
+        }
 
-		#egg-container {
-			display: flex;
-			flex-wrap: wrap;
-			justify-content: center;
-			margin-top: 50px;
-		}
+        #egg-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 50px;
+        }
 
-		#egg-container img {
-			height: 75px;
-			width: 50px;
-			margin: 20px 50px 20px 50px;
-			cursor: pointer;
-		}
+        #egg-container img {
+            max-width: 150px;
+            margin: 10px;
+        }
 
         #help {
+            font-size: 0.8em;
+            color: #333;
             display: flex;
             justify-content: center;
             margin-top: 50px;
@@ -36,20 +37,20 @@
             -webkit-filter: blur(5px) grayscale(50%);
         }
 
-		#modal {
-			position: fixed;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-			background-color: #aec6cf;
-			padding: 20px;
-			border-radius: 5px;
-			box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
+        #modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #aec6cf;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
             text-align: center;
             min-width: 200px;
             max-width: 400px;
             width: 80%;
-		}
+        }
 
         #close-btn {
             position: absolute;
@@ -71,9 +72,9 @@
             padding: 10px;
         }
 
-		.hidden {
-			display: none;
-		}
+        .hidden {
+            display: none;
+        }
 
         .found {
             opacity: 0.25;
@@ -97,7 +98,7 @@
           font-weight: bold;
           color: white;
         }
-	</style>
+    </style>
 </head>
 <body>
     <div id="page-wrap">
@@ -118,24 +119,24 @@
 
 
     <script src="eggData.js"></script>
-	<script>
+    <script>
         const eggData = getEggData();
-		const pageWrap = document.getElementById('page-wrap');
-		const eggContainer = document.getElementById('egg-container');
-		let foundEggs = [];
+        const pageWrap = document.getElementById('page-wrap');
+        const eggContainer = document.getElementById('egg-container');
+        let foundEggs = [];
         let currentIndex = null;
 
-		for (let i = 0; i < eggData.length; i++) {
-			const egg = eggData[i];
-			const img = document.createElement('img');
-			img.setAttribute('id', `egg-${i}`);
-			img.setAttribute('src', egg.image);
-			img.addEventListener('click', () => {
+        for (let i = 0; i < eggData.length; i++) {
+            const egg = eggData[i];
+            const img = document.createElement('img');
+            img.setAttribute('id', `egg-${i}`);
+            img.setAttribute('src', egg.image);
+            img.addEventListener('click', () => {
                 showModal(i);
-			});
+            });
 
             const eggLabel = document.createElement('div');
-			eggLabel.setAttribute('id', `egg-label-${i}`);
+            eggLabel.setAttribute('id', `egg-label-${i}`);
             eggLabel.classList.add('egg-label');
             eggLabel.classList.add('hidden');
             eggLabel.textContent = egg.letter;
@@ -145,15 +146,15 @@
             eggOverlay.appendChild(img);
             eggOverlay.appendChild(eggLabel);
 
-			eggContainer.appendChild(eggOverlay);
-		}
+            eggContainer.appendChild(eggOverlay);
+        }
 
-		const modal = document.getElementById('modal');
-		const modalImg = document.getElementById('modal-img');
-		const modalClue = document.getElementById('clue');
-		const modalResponse = document.getElementById('response');
-		const foundItBtn = document.getElementById('found-it-btn');
-		const closeBtn = document.getElementById('close-btn');
+        const modal = document.getElementById('modal');
+        const modalImg = document.getElementById('modal-img');
+        const modalClue = document.getElementById('clue');
+        const modalResponse = document.getElementById('response');
+        const foundItBtn = document.getElementById('found-it-btn');
+        const closeBtn = document.getElementById('close-btn');
 
         closeBtn.addEventListener('click', hideModal);
         foundItBtn.addEventListener('click', checkLocation);
@@ -163,14 +164,14 @@
             storedEggs.forEach(index => addFoundEgg(index));
         }
 
-		function showModal(index) {
+        function showModal(index) {
             stopAudio();
 
             const egg = eggData[index];
             pageWrap.classList.add('blurry');
             currentIndex = index;
 
-			modalImg.setAttribute('src', egg.image);
+            modalImg.setAttribute('src', egg.image);
 
             if (egg.found) {
                 showSuccess(index);
@@ -184,22 +185,22 @@
                 foundItBtn.classList.remove('hidden');
             }
 
-			modal.classList.remove('hidden');
-		}
+            modal.classList.remove('hidden');
+        }
 
-		function hideModal() {
-			modal.classList.add('hidden');
+        function hideModal() {
+            modal.classList.add('hidden');
             pageWrap.classList.remove('blurry');
             currentIndex = null;
             stopAudio();
-		}
+        }
 
         function hideClue() {
-			modalClue.classList.add('hidden');
+            modalClue.classList.add('hidden');
         }
 
         function showResponse(message) {
-			foundItBtn.classList.add('hidden');
+            foundItBtn.classList.add('hidden');
             modalResponse.classList.remove('hidden');
             modalResponse.innerHTML = message;
         }
@@ -225,12 +226,12 @@
             }
         }
 
-		function checkLocation() {
-			if (navigator.geolocation) {
-				navigator.geolocation.getCurrentPosition(position => {
-					const egg = eggData[currentIndex];
-					const distance = getDistanceInMeters(position.coords.latitude, position.coords.longitude, egg.location.lat, egg.location.lng);
-					if (distance <= 10) {
+        function checkLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const egg = eggData[currentIndex];
+                    const distance = getDistanceInMeters(position.coords.latitude, position.coords.longitude, egg.location.lat, egg.location.lng);
+                    if (distance <= 10) {
                         addFoundEgg(currentIndex);
                         storeFoundEggs();
                         hideClue();
