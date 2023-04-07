@@ -16,6 +16,8 @@ body {
 #egg-container img {
     max-height: 150px;
     margin: 10px;
+    -webkit-filter: drop-shadow(5px 5px 5px #222);
+    filter: drop-shadow(5px 5px 5px #888);
 }
 
 #modal-img {
@@ -28,6 +30,10 @@ body {
     display: flex;
     justify-content: center;
     margin-top: 50px;
+}
+
+#help a {
+    text-decoration: none;
 }
 
 .blurry {
