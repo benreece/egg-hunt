@@ -1,32 +1,7 @@
-const eggData = getEggData();
+const puzzleData = getPuzzleData();
+const eggData = puzzleData['eggs'];
 const pageWrap = document.getElementById('page-wrap');
 const eggContainer = document.getElementById('egg-container');
-let foundEggs = [];
-let currentIndex = null;
-
-for (let i = 0; i < eggData.length; i++) {
-    const egg = eggData[i];
-    const img = document.createElement('img');
-    img.setAttribute('id', `egg-${i}`);
-    img.setAttribute('src', egg.image);
-    img.addEventListener('click', () => {
-        showModal(i);
-    });
-
-    const eggLabel = document.createElement('div');
-    eggLabel.setAttribute('id', `egg-label-${i}`);
-    eggLabel.classList.add('egg-label');
-    eggLabel.classList.add('hidden');
-    eggLabel.textContent = egg.letter;
-
-    const eggOverlay = document.createElement('div');
-    eggOverlay.classList.add('egg-overlay');
-    eggOverlay.appendChild(img);
-    eggOverlay.appendChild(eggLabel);
-
-    eggContainer.appendChild(eggOverlay);
-}
-
 const modal = document.getElementById('modal');
 const modalImg = document.getElementById('modal-img');
 const modalClue = document.getElementById('clue');
@@ -34,12 +9,76 @@ const modalResponse = document.getElementById('response');
 const foundItBtn = document.getElementById('found-it-btn');
 const closeBtn = document.getElementById('close-btn');
 
-closeBtn.addEventListener('click', hideModal);
-foundItBtn.addEventListener('click', checkLocation);
+let foundEggs = [];
+let currentIndex = null;
 
-storedEggs = JSON.parse(window.localStorage.getItem("foundEggs"));
-if (Array.isArray(storedEggs)) {
-    storedEggs.forEach(index => addFoundEgg(index));
+now = new Date();
+if (puzzleData['start_time']) {
+    startTime = new Date(puzzleData['start_time']);
+} else {
+    startTime = new Date('2000-01-01');
+}
+
+if (startTime <= now) {
+    initEggHunt();
+} else {
+    initTimer();
+}
+
+document.getElementById('title').innerHTML = puzzleData.title ?? '';
+
+function initTimer() {
+    timer = document.getElementById('egg-container');
+    timer.classList.add('timer');
+
+    var x = setInterval(function() {
+      var now = new Date().getTime();
+      var distance = startTime - now;
+      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      timer.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+
+      if (distance < 0) {
+        clearInterval(x);
+        window.location.reload();
+      }
+    }, 1000);
+}
+
+function initEggHunt() {
+    for (let i = 0; i < eggData.length; i++) {
+        const egg = eggData[i];
+        const img = document.createElement('img');
+        img.setAttribute('id', `egg-${i}`);
+        img.setAttribute('src', egg.image);
+        img.addEventListener('click', () => {
+            showModal(i);
+        });
+
+        const eggLabel = document.createElement('div');
+        eggLabel.setAttribute('id', `egg-label-${i}`);
+        eggLabel.classList.add('egg-label');
+        eggLabel.classList.add('hidden');
+        eggLabel.textContent = egg.letter;
+
+        const eggOverlay = document.createElement('div');
+        eggOverlay.classList.add('egg-overlay');
+        eggOverlay.appendChild(img);
+        eggOverlay.appendChild(eggLabel);
+
+        eggContainer.appendChild(eggOverlay);
+    }
+
+    closeBtn.addEventListener('click', hideModal);
+    foundItBtn.addEventListener('click', checkLocation);
+
+    storedEggs = JSON.parse(window.localStorage.getItem("foundEggs"));
+    if (Array.isArray(storedEggs)) {
+        storedEggs.forEach(index => addFoundEgg(index));
+    }
 }
 
 function showModal(index) {
