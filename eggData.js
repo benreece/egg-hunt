@@ -1,5 +1,5 @@
 const allEggData = {
-    'Dorm123': {
+    'BYU': {
         'title': '',
         'start_time': '2023-04-08 08:00',
         'eggs': [
