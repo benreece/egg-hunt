@@ -1,7 +1,7 @@
 const allEggData = {
     'Dorm123': {
         'title': 'Dorm 123',
-        'start_time': '2023-04-07 21:00',
+        'start_time': '2023-04-08 08:00',
         'eggs': [
             {
                 clue: "During the final week of His ministry the Savior cleansed the temple.<p>BYU's business school is in a building sometimes called 'the box the temple came in' due to its similar shape to the Salt Lake temple.</p><p>Latter-day temples often have 'Holiness to the Lord, The House of the Lord' written on the side; on most temples this inscription faces the same direction.</p><p>Go to this side of the temple box.</p>",
