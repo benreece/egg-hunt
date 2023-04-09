@@ -108,7 +108,7 @@ const allEggData = {
                 found: false,
             },
             {
-                clue: "<p><img src='assets/byu/wordcloud2.png'>",
+                clue: "<p><img src='assets/byu/wordcloud2.png'><p>Southeast corner",
                 response: "<p>BYU's extracurricular programs provide opportunities for participants and fans to spread the gospel as they interact with others.<p>How does <i>your</i> example influence others?",
                 location: { lat: 40.25361551959949, lng: -111.64868089619317 },
                 image: "assets/eggs/egg5.png",
