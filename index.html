@@ -15,12 +15,17 @@
         <p>
     </div>
 
+    <div id="message-modal" class="hidden">
+        <button type="button" id="message-close-btn" class="btn-close" data-bs-dismiss="message-modal" onclick="closeMessage()"></button>
+        <p id="message"></p>
+    </div>
+
     <div id="modal" class="hidden">
         <button type="button" id="close-btn" class="btn-close" data-bs-dismiss="modal"></button>
         <img id="modal-img" src="" alt="Egg Image">
         <p id="clue"></p>
         <p id="response"></p>
-        <button id="found-it-btn" class="btn btn-primary">I think I found it</button>
+        <button id="found-it-btn" class="btn btn-primary">Found It</button>
         <audio id="audio"></audio>
     </div>
 

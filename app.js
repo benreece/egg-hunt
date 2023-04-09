@@ -49,6 +49,7 @@ function initTimer() {
 }
 
 function initEggHunt() {
+
     for (let i = 0; i < eggData.length; i++) {
         const egg = eggData[i];
         const img = document.createElement('img');
@@ -79,9 +80,36 @@ function initEggHunt() {
     if (Array.isArray(storedEggs)) {
         storedEggs.forEach(index => addFoundEgg(index));
     }
+
+    if (allCluesFound()) {
+        showMessage(puzzleData.end_clue);
+    } else {
+        showMessage(puzzleData.start_clue);
+    }
+}
+
+function allCluesFound() {
+    var allFound = true;
+    eggData.forEach((egg) => { if (!egg.found) allFound = false; });
+    return allFound;
+}
+
+function showMessage(text) {
+    const messageModal = document.getElementById('message-modal');
+    const message = document.getElementById('message');
+    message.innerHTML = text;
+    pageWrap.classList.add('blurry');
+    messageModal.classList.remove('hidden');
+}
+
+function closeMessage() {
+    const messageModal = document.getElementById('message-modal');
+    messageModal.classList.add('hidden');
+    pageWrap.classList.remove('blurry');
 }
 
 function showModal(index) {
+    closeMessage();
     stopAudio();
 
     const egg = eggData[index];
@@ -146,6 +174,7 @@ function hideResponse(index) {
 function checkLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(position => {
+            console.log(position.coords);
             const egg = eggData[currentIndex];
             const distance = getDistanceInMeters(position.coords.latitude, position.coords.longitude, egg.location.lat, egg.location.lng);
             if (distance <= 10) {
