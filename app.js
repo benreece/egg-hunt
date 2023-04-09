@@ -177,7 +177,7 @@ function checkLocation() {
             console.log(position.coords);
             const egg = eggData[currentIndex];
             const distance = getDistanceInMeters(position.coords.latitude, position.coords.longitude, egg.location.lat, egg.location.lng);
-            if (distance <= 10) {
+            if (distance <= 50) {
                 addFoundEgg(currentIndex);
                 storeFoundEggs();
                 hideClue();
