@@ -1,3 +1,6 @@
+const LOCATION_RADIUS_METERS = 20;
+const LOW_ACCURACY_THRESHOLD = 20;
+
 const puzzleData = getPuzzleData();
 const eggData = puzzleData['eggs'];
 const pageWrap = document.getElementById('page-wrap');
@@ -76,7 +79,7 @@ function initEggHunt() {
     closeBtn.addEventListener('click', hideModal);
     foundItBtn.addEventListener('click', checkLocation);
 
-    storedEggs = JSON.parse(window.localStorage.getItem("foundEggs"));
+    storedEggs = JSON.parse(window.localStorage.getItem(getStorageKey()));
     if (Array.isArray(storedEggs)) {
         storedEggs.forEach(index => addFoundEgg(index));
     }
@@ -150,11 +153,16 @@ function showResponse(message) {
     modalResponse.innerHTML = message;
 }
 
-function showError(distance) {
+function showError(distance, accuracy) {
     modalResponse.classList.add('error');
     modalResponse.classList.remove('success');
-    showResponse(`Sorry, you're still about ${parseFloat(distance.toPrecision(2))} meters away. Keep looking!`);
-    setTimeout(hideResponse, 5000, currentIndex);
+    if (accuracy > LOW_ACCURACY_THRESHOLD) {
+        modalClue.classList.add('hidden');
+        showResponse(`<p>ERROR: We can't tell if you're close to the egg!  We're only able to locate you to within about ${parseFloat(accuracy.toPrecision(2))} meters (we need accuracy to ${LOW_ACCURACY_THRESHOLD} meters).<p>Do you have high accuracy mode enabled on your device?`);
+    } else {
+        showResponse(`Sorry, you're still about ${parseFloat(distance.toPrecision(2))} meters away. Keep looking!`);
+        setTimeout(hideResponse, 5000, currentIndex);
+    }
 }
 
 function showSuccess() {
@@ -174,18 +182,17 @@ function hideResponse(index) {
 function checkLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(position => {
-            console.log(position.coords);
             const egg = eggData[currentIndex];
             const distance = getDistanceInMeters(position.coords.latitude, position.coords.longitude, egg.location.lat, egg.location.lng);
-            if (distance <= 50) {
+            if (distance <= LOCATION_RADIUS_METERS && position.coords.accuracy <= LOW_ACCURACY_THRESHOLD) {
                 addFoundEgg(currentIndex);
                 storeFoundEggs();
                 hideClue();
                 showSuccess();
             } else {
-                showError(distance);
+                showError(distance, position.coords.accuracy);
             }
-        }, null, {'enableHighAccuracy': true});
+        }, null, {'enableHighAccuracy': true});  // TODO: add error handler
     } else {
         alert("Geolocation is not supported by this browser.");
     }
@@ -200,11 +207,11 @@ function addFoundEgg(index) {
 }
 
 function storeFoundEggs() {
-    window.localStorage.setItem("foundEggs", JSON.stringify(foundEggs));
+    window.localStorage.setItem(getStorageKey(), JSON.stringify(foundEggs));
 }
 
 function clearFoundEggs() {
-    window.localStorage.removeItem("foundEggs", foundEggs);
+    window.localStorage.removeItem(getStorageKey(), foundEggs);
     window.location.reload();
 }
 
@@ -233,4 +240,16 @@ function playAudio(source) {
 function stopAudio() {
     audio = document.getElementById('audio');
     audio.pause();
+}
+
+function getKey() {
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop) => searchParams.get(prop),
+    });
+
+    return params.key;
+}
+
+function getStorageKey() {
+    return `foundEggs-${getKey()}`;
 }
