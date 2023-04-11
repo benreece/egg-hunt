@@ -31,6 +31,7 @@ if (startTime <= now) {
 document.getElementById('title').innerHTML = puzzleData.title ?? '';
 
 function initTimer() {
+    help = document.getElementById('help').classList.add('hidden');
     timer = document.getElementById('egg-container');
     timer.classList.add('timer');
 
