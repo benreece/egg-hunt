@@ -1,7 +1,7 @@
 const allEggData = {
     'BYU': {
         'title': '',
-        'start_time': '2023-04-08 08:00',
+        'start_time': '2023-04-12 18:15 MDT',
         'start_clue': "<p><b>Welcome!</b><p>Find all the eggs to reveal the final clue!<p>Each egg you find will reveal a part of the final clue.  Feel free to use the internet, friends, strangers, and any other resources.<p>Start anywhere near or on BYU campus; visitor parking at the BYU Museum of Art is recommended.<p>The clue sequence has been randomized; the order that you choose to visit them will affect how quickly you complete the hunt.",
         'end_clue': "<p><b>Well done so far!</b><p>Once you solve the final clue, you may want to drive to the final destination.<p>When you arrive, say you're with the __ party.",
         // front of the admin building: 7922+H7
