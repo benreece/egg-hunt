@@ -1,5 +1,5 @@
 const LOCATION_RADIUS_METERS = 20;
-const LOW_ACCURACY_THRESHOLD = 20;
+const MIN_ACCURACY_THRESHOLD = 20;
 
 const puzzleData = getPuzzleData();
 const eggData = puzzleData['eggs'];
@@ -158,9 +158,9 @@ function showResponse(message) {
 function showError(distance, accuracy) {
     modalResponse.classList.add('error');
     modalResponse.classList.remove('success');
-    if (accuracy > LOW_ACCURACY_THRESHOLD) {
+    if (accuracy > MIN_ACCURACY_THRESHOLD) {
         hideClue();
-        showResponse(`<p>ERROR: We can't tell if you're close to the egg!  We're only able to locate you to within about ${parseFloat(accuracy.toPrecision(2))} meters (we need accuracy to ${LOW_ACCURACY_THRESHOLD} meters).<p>Do you have high accuracy mode enabled on your device?`);
+        showResponse(`<p>ERROR: We can't tell if you're close to the egg!  We're only able to locate you to within about ${parseFloat(accuracy.toPrecision(2))} meters (we need accuracy to ${MIN_ACCURACY_THRESHOLD} meters).<p>Do you have high accuracy mode enabled on your device?`);
     } else {
         showResponse(`Sorry, you're still about ${parseFloat(distance.toPrecision(2))} meters away. Keep looking!`);
         setTimeout(hideResponse, 5000, currentIndex);
@@ -179,6 +179,8 @@ function hideResponse(index) {
         modalResponse.classList.add('hidden');
         foundItBtn.classList.remove('hidden');
     }
+    document.getElementById('btn-spinner').classList.add('hidden');
+    foundItBtn.classList.remove('disabled');
 }
 
 function checkLocation() {
@@ -190,7 +192,7 @@ function checkLocation() {
         navigator.geolocation.getCurrentPosition(position => {
             const egg = eggData[currentIndex];
             const distance = getDistanceInMeters(position.coords.latitude, position.coords.longitude, egg.location.lat, egg.location.lng);
-            if (distance <= LOCATION_RADIUS_METERS && position.coords.accuracy <= LOW_ACCURACY_THRESHOLD) {
+            if (distance <= LOCATION_RADIUS_METERS && position.coords.accuracy <= MIN_ACCURACY_THRESHOLD) {
                 addFoundEgg(currentIndex);
                 storeFoundEggs();
                 hideClue();
