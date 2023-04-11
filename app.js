@@ -120,6 +120,8 @@ function showModal(index) {
     currentIndex = index;
 
     modalImg.setAttribute('src', egg.image);
+    document.getElementById('btn-spinner').classList.add('hidden');
+    foundItBtn.classList.remove('disabled');
 
     if (egg.found) {
         showSuccess(index);
@@ -157,7 +159,7 @@ function showError(distance, accuracy) {
     modalResponse.classList.add('error');
     modalResponse.classList.remove('success');
     if (accuracy > LOW_ACCURACY_THRESHOLD) {
-        modalClue.classList.add('hidden');
+        hideClue();
         showResponse(`<p>ERROR: We can't tell if you're close to the egg!  We're only able to locate you to within about ${parseFloat(accuracy.toPrecision(2))} meters (we need accuracy to ${LOW_ACCURACY_THRESHOLD} meters).<p>Do you have high accuracy mode enabled on your device?`);
     } else {
         showResponse(`Sorry, you're still about ${parseFloat(distance.toPrecision(2))} meters away. Keep looking!`);
@@ -180,6 +182,10 @@ function hideResponse(index) {
 }
 
 function checkLocation() {
+    // add loading indicator to button & disable it
+    document.getElementById('btn-spinner').classList.remove('hidden');
+    foundItBtn.classList.add('disabled');
+
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(position => {
             const egg = eggData[currentIndex];
@@ -192,7 +198,7 @@ function checkLocation() {
             } else {
                 showError(distance, position.coords.accuracy);
             }
-        }, null, {'enableHighAccuracy': true});  // TODO: add error handler
+        }, null, {enableHighAccuracy: true});  // TODO: add error handler
     } else {
         alert("Geolocation is not supported by this browser.");
     }
