@@ -2,8 +2,8 @@ const allEggData = {
     'BYU': {
         'title': '',
         'start_time': '2023-04-12 18:15 MDT',
-        'start_clue': "<p><b>Welcome!</b><p>Find all the eggs to reveal the final clue!<p>Each egg you find will reveal a part of the final clue.  Feel free to use the internet, friends, strangers, and any other resources.<p>Start anywhere near or on BYU campus; visitor parking at the BYU Museum of Art is recommended.<p>The clue sequence has been randomized; the order that you choose to visit them will affect how quickly you complete the hunt.",
-        'end_clue': "<p><b>Well done so far!</b><p>Once you solve the final clue, you may want to drive to the final destination.<p>When you arrive, say you're with the __ party.",
+        'start_clue': "<p><b>Welcome!</b><p>Find all the eggs to reveal the final clue leading to your reward!<p>Find an egg by going to the location indicated by the clue and clicking the button; we'll check your location to see if you're at the right place.<p>Feel free to use the internet, friends, strangers, and any other resources.<p>Start anywhere near or on BYU campus; visitor parking at the BYU Museum of Art is recommended.<p>The clue sequence has been randomized; the order that you choose to visit them will affect how quickly you complete the hunt.",
+        'end_clue': "<p><b>Well done so far!</b><p>Solve the final clue and head to the destination for a treat -- you're almost done!",
         'eggs': [
             {
                 clue: "During the final week of His ministry the Savior cleansed the temple.<p>BYU's business school is in a building sometimes called 'the box the temple came in' due to its similar shape to the Salt Lake temple.</p><p>Latter-day temples often have 'Holiness to the Lord, The House of the Lord' written on the side; on most temples this inscription faces the same direction.</p><p>Go to this side of the temple box.</p>",
@@ -30,7 +30,7 @@ const allEggData = {
                 found: false,
             },
             {
-                clue: "The 4th location is aptly named:<p>Sides: 4<br>Sidewalks: 4<br>Triangles: 4<br>Pairs of benches: 4<br>Squares contained: 4<p>Find the center.",
+                clue: "The 4th location is aptly named:<p>Sides: 4<br>Sidewalks: 4<br>Triangles: 4<br>Squares contained: 4<br>Planter pots: 4<p>Find the center.",
                 response: "Stand in the center of the quad and consider what we find with Christ at the center of our lives (see Isaiah 48:18).",
                 location: { lat: 40.24973167558686, lng: -111.64927428437377 },
                 image: "assets/eggs/egg4.png",

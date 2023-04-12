@@ -213,6 +213,11 @@ function addFoundEgg(index) {
     document.getElementById(`egg-label-${index}`).classList.remove('hidden');
     const eggImg = document.getElementById(`egg-${index}`);
     eggImg.classList.add('found');
+
+    if (allCluesFound()) {
+        // TODO: this should queue the message rather than just display it.
+        //showMessage(puzzleData.end_clue);
+    }
 }
 
 function storeFoundEggs() {
