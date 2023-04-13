@@ -15,7 +15,7 @@ const closeBtn = document.getElementById('close-btn');
 let foundEggs = [];
 let currentIndex = null;
 
-now = new Date();
+/*now = new Date();
 if (puzzleData['start_time']) {
     startTime = new Date(puzzleData['start_time']);
 } else {
@@ -26,9 +26,10 @@ if (startTime <= now) {
     initEggHunt();
 } else {
     initTimer();
-}
+}*/
+initEggHunt();
 
-document.getElementById('title').innerHTML = puzzleData.title ?? '';
+//document.getElementById('title').innerHTML = puzzleData.title ?? '';
 
 function initTimer() {
     help = document.getElementById('help').classList.add('hidden');
